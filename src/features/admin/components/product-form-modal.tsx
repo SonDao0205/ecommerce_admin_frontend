@@ -233,15 +233,24 @@ export function ProductFormModal({
             />
           </Field>
           {variantsValue.length === 0 && (
-            <Field label="Tồn kho sản phẩm" error={errors.stock?.message}>
+            <Field
+              label={product ? "Tồn kho hiện tại (chỉ xem)" : "Tồn kho sản phẩm"}
+              error={errors.stock?.message}
+            >
               <Input
                 {...register("stock", { valueAsNumber: true })}
                 type="number"
                 min="0"
                 step="1"
-                required
+                required={!product}
+                disabled={Boolean(product)}
                 placeholder="Nhập số lượng tồn kho"
               />
+              {product && (
+                <p className="text-xs text-muted-foreground">
+                  Hãy vào trang Quản lý kho để thay đổi số lượng và ghi lý do.
+                </p>
+              )}
             </Field>
           )}
           <div className="sm:col-span-2">
@@ -265,6 +274,7 @@ export function ProductFormModal({
           key={`variants-${product?.id ?? "new"}-${open}`}
           initialVariants={product?.variants}
           disabled={pending}
+          stockReadOnly={Boolean(product)}
           skuErrors={variantSkuErrors}
           onChange={(variants) => {
             setVariantsValue(variants);

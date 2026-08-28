@@ -24,6 +24,7 @@ interface ProductVariantEditorProps {
   disabled?: boolean;
   onChange: (variants: ProductVariantGroupInput[]) => void;
   skuErrors?: Record<string, string>;
+  stockReadOnly?: boolean;
 }
 
 function newChild(): VariantChildDraft {
@@ -42,6 +43,7 @@ export function ProductVariantEditor({
   disabled,
   onChange,
   skuErrors = {},
+  stockReadOnly = false,
 }: ProductVariantEditorProps) {
   const [groups, setGroups] = useState<VariantGroupDraft[]>(() =>
     initialVariants.map((group) => ({
@@ -114,7 +116,11 @@ export function ProductVariantEditor({
       <div className="flex items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2 font-semibold"><Boxes className="size-4 text-[#ff5a1f]" /> Biến thể sản phẩm</div>
-          <p className="mt-1 text-xs text-muted-foreground">Nhóm cha như Màu sắc; biến thể con như Dung lượng có giá và tồn kho riêng.</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {stockReadOnly
+              ? "Khi sửa sản phẩm, tồn kho chỉ được xem và phải cập nhật tại trang Quản lý kho."
+              : "Nhóm cha như Màu sắc; biến thể con như Dung lượng có giá và tồn kho riêng."}
+          </p>
         </div>
         <Button type="button" size="sm" variant="outline" disabled={disabled} onClick={addGroup}>
           <Plus /> Thêm nhóm
@@ -146,7 +152,7 @@ export function ProductVariantEditor({
                 <VariantField label="Giá trị"><Input required value={child.value} disabled={disabled} placeholder="256GB" onChange={(event) => updateChild(groupIndex, childIndex, { value: event.target.value })} /></VariantField>
                 <VariantField label="SKU" error={skuErrors[child.sku]}><Input required value={child.sku} disabled={disabled} placeholder="IP-BLK-256" aria-invalid={Boolean(skuErrors[child.sku])} onChange={(event) => updateChild(groupIndex, childIndex, { sku: event.target.value })} /></VariantField>
                 <VariantField label="Giá"><Input required type="number" min="0" value={child.unitPrice} disabled={disabled} onChange={(event) => updateChild(groupIndex, childIndex, { unitPrice: Number(event.target.value) })} /></VariantField>
-                <VariantField label="Tồn kho"><Input required type="number" min="0" step="1" value={child.stock} disabled={disabled} onChange={(event) => updateChild(groupIndex, childIndex, { stock: Number(event.target.value) })} /></VariantField>
+                <VariantField label={stockReadOnly ? "Tồn kho (chỉ xem)" : "Tồn kho"}><Input required={!stockReadOnly} type="number" min="0" step="1" value={child.stock} disabled={disabled || stockReadOnly} onChange={(event) => updateChild(groupIndex, childIndex, { stock: Number(event.target.value) })} /></VariantField>
                 <Button type="button" size="icon-sm" variant="ghost" title="Xóa biến thể con" disabled={disabled || group.children.length === 1} onClick={() => updateGroup(groupIndex, { children: group.children.filter((_, index) => index !== childIndex) })} className="self-end text-destructive hover:text-destructive">
                   <Trash2 />
                 </Button>

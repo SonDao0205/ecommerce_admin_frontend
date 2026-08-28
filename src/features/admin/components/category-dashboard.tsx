@@ -66,47 +66,12 @@ export function CategoryDashboard() {
             Mở từng danh mục để tải các tầng con theo nhu cầu.
           </p>
         </div>
-        <Button onClick={() => openCreate()} className="bg-[#ff5a1f] text-white hover:bg-[#e94b13]">
+        <Button
+          onClick={() => openCreate()}
+          className="bg-[#ff5a1f] text-white hover:bg-[#e94b13]"
+        >
           <Plus /> Thêm danh mục
         </Button>
-      </div>
-
-      <div className="mb-6 grid gap-[18px] sm:grid-cols-3">
-        <Card className="rounded-[10px] py-0 shadow-none">
-          <CardContent className="flex items-center gap-4 p-5">
-            <div className="flex size-11 items-center justify-center rounded-lg bg-[#fff2ec] text-[#ff5a1f]">
-              <FolderTree />
-            </div>
-            <div>
-              <p className="text-xs text-[#888]">Danh mục gốc</p>
-              <strong className="mt-1 block text-xl">
-                {rootsQuery.data?.meta.totalItems ?? "—"}
-              </strong>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="rounded-[10px] py-0 shadow-none">
-          <CardContent className="flex items-center gap-4 p-5">
-            <div className="flex size-11 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-              <Zap />
-            </div>
-            <div>
-              <p className="text-xs text-[#888]">Cách tải dữ liệu</p>
-              <strong className="mt-1 block text-sm">Lazy loading</strong>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="rounded-[10px] py-0 shadow-none">
-          <CardContent className="flex items-center gap-4 p-5">
-            <div className="flex size-11 items-center justify-center rounded-lg bg-green-50 text-green-600">
-              <Server />
-            </div>
-            <div>
-              <p className="text-xs text-[#888]">Cache nhánh đã tải</p>
-              <strong className="mt-1 block text-sm">Trong toàn phiên</strong>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       <Card className="overflow-hidden rounded-[10px] py-0 shadow-none">
@@ -122,7 +87,11 @@ export function CategoryDashboard() {
           <Alert variant="destructive" className="m-4 w-auto">
             <AlertDescription className="flex items-center justify-between gap-3">
               Không thể tải danh mục gốc.
-              <Button size="sm" variant="outline" onClick={() => rootsQuery.refetch()}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => rootsQuery.refetch()}
+              >
                 Thử lại
               </Button>
             </AlertDescription>
@@ -150,7 +119,9 @@ export function CategoryDashboard() {
         onOpenChange={(open) => !open && setStatusCategory(null)}
         title={`${statusCategory?.isActive ? "Ẩn" : "Hiện"} danh mục?`}
         description={`Bạn có chắc muốn ${statusCategory?.isActive ? "ẩn" : "hiện"} “${statusCategory?.name ?? ""}”?`}
-        confirmLabel={statusCategory?.isActive ? "Ẩn danh mục" : "Hiện danh mục"}
+        confirmLabel={
+          statusCategory?.isActive ? "Ẩn danh mục" : "Hiện danh mục"
+        }
         tone={statusCategory?.isActive ? "danger" : "success"}
         pending={updateCategoryStatus.isPending}
         onConfirm={handleStatusChange}
