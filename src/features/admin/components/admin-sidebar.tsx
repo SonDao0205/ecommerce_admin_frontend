@@ -10,6 +10,7 @@ import {
   ShoppingCart,
   Tags,
   Users,
+  LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -17,7 +18,18 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { authService } from "@/src/features/auth";
 
-const sections = [
+interface SidebarItem {
+  label: string;
+  icon: LucideIcon;
+  href?: string;
+}
+
+interface SidebarSection {
+  title: string;
+  items: SidebarItem[];
+}
+
+const sections: SidebarSection[] = [
   {
     title: "Tổng quan",
     items: [{ label: "Dashboard", icon: LayoutDashboard, href: "/admin" }],

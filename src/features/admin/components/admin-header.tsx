@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  ChevronDown,
-  Menu,
-  Search,
-  UserRound,
-} from "lucide-react";
+import { ChevronDown, Menu, Search, UserRound } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,7 +26,13 @@ export function AdminHeader() {
   const pathname = usePathname();
   const title = pathname.startsWith("/admin/categories")
     ? "Quản lý danh mục"
-    : "Quản lý sản phẩm";
+    : pathname.startsWith("/admin/products")
+      ? "Quản lý sản phẩm"
+      : pathname.startsWith("/admin/orders")
+        ? "Quản lý đơn hàng"
+        : pathname.startsWith("/admin/inventory")
+          ? "Quản lý tồn kho"
+          : "Tổng quan kinh doanh";
 
   function handleLogout() {
     authService.logout();
@@ -63,9 +64,6 @@ export function AdminHeader() {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-4">
-        <Button variant="outline" size="icon" aria-label="Tìm kiếm">
-          <Search />
-        </Button>
         <AuditLogBell />
 
         <DropdownMenu>
@@ -85,7 +83,9 @@ export function AdminHeader() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem>Tài khoản</DropdownMenuItem>
-            <DropdownMenuItem onClick={handleLogout}>Đăng xuất</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
+              Đăng xuất
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

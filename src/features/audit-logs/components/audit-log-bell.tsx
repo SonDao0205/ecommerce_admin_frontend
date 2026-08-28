@@ -71,11 +71,16 @@ export function AuditLogBell() {
       </SheetTrigger>
       <SheetContent className="w-full gap-0 sm:max-w-md">
         <SheetHeader className="border-b px-5 py-4">
-          <SheetTitle className="text-lg font-bold">Nhật ký hệ thống</SheetTitle>
+          <SheetTitle className="text-lg font-bold">
+            Nhật ký hệ thống
+          </SheetTitle>
           <SheetDescription>
             <span className="inline-flex items-center gap-2">
-              <span className={`size-2 rounded-full ${connected ? "bg-emerald-500" : "bg-amber-500"}`} />
-              {connected ? "Đang cập nhật trực tiếp" : "Đang kết nối lại"} · 50 thao tác gần nhất
+              <span
+                className={`size-2 rounded-full ${connected ? "bg-emerald-500" : "bg-amber-500"}`}
+              />
+              {connected ? "Đang cập nhật trực tiếp" : "Đang kết nối lại"} · 50
+              thao tác gần nhất
             </span>
           </SheetDescription>
         </SheetHeader>
@@ -84,14 +89,19 @@ export function AuditLogBell() {
           {isLoading && (
             <div className="space-y-3 pt-5">
               {[1, 2, 3].map((item) => (
-                <div key={item} className="h-20 animate-pulse rounded-xl bg-slate-100" />
+                <div
+                  key={item}
+                  className="h-20 animate-pulse rounded-xl bg-slate-100"
+                />
               ))}
             </div>
           )}
           {isError && (
             <div className="mt-8 flex flex-col items-center rounded-xl border border-red-100 bg-red-50 p-5 text-center">
               <CircleAlert className="mb-2 text-red-500" />
-              <p className="text-sm text-red-700">Không thể tải nhật ký hệ thống.</p>
+              <p className="text-sm text-red-700">
+                Không thể tải nhật ký hệ thống.
+              </p>
               <Button
                 variant="outline"
                 size="sm"
@@ -134,7 +144,10 @@ export function AuditLogBell() {
                           </time>
                         </div>
                         <p className="mt-1 text-xs text-slate-500">
-                          Bởi <span className="font-semibold text-slate-700">{log.actorName}</span>
+                          Bởi{" "}
+                          <span className="font-semibold text-slate-700">
+                            {log.actorName}
+                          </span>
                           {log.actorEmail ? ` · ${log.actorEmail}` : ""}
                         </p>
                       </div>
