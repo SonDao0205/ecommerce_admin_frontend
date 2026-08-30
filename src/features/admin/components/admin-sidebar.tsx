@@ -17,6 +17,8 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { authService } from "@/src/features/auth";
+import { useState } from "react";
+import { ConfirmDialog } from "@/src/components/common/confirm-dialog";
 
 interface SidebarItem {
   label: string;
@@ -52,13 +54,15 @@ const sections: SidebarSection[] = [
 export function AdminSidebar({ mobile = false }: { mobile?: boolean }) {
   const router = useRouter();
   const pathname = usePathname();
+  const [logoutOpen, setLogoutOpen] = useState(false);
 
   function handleLogout() {
     authService.logout();
+    setLogoutOpen(false);
     router.replace("/login");
   }
 
-  return (
+  return <>
     <aside
       className={cn(
         "flex h-full w-[250px] flex-col bg-[#171717] text-white",
@@ -113,7 +117,7 @@ export function AdminSidebar({ mobile = false }: { mobile?: boolean }) {
       <div className="border-t border-[#303030] p-3.5">
         <button
           type="button"
-          onClick={handleLogout}
+          onClick={() => setLogoutOpen(true)}
           className="flex h-[46px] w-full items-center rounded-lg px-3.5 text-sm text-[#bbb] transition hover:bg-[#292929] hover:text-white"
         >
           <LogOut className="mr-3 size-[18px]" />
@@ -121,5 +125,13 @@ export function AdminSidebar({ mobile = false }: { mobile?: boolean }) {
         </button>
       </div>
     </aside>
-  );
+    <ConfirmDialog
+      open={logoutOpen}
+      onOpenChange={setLogoutOpen}
+      title="Xác nhận đăng xuất"
+      description="Bạn có chắc muốn đăng xuất khỏi trang quản trị?"
+      confirmLabel="Đăng xuất"
+      onConfirm={handleLogout}
+    />
+  </>;
 }

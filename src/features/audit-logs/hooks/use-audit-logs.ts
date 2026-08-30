@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { auditLogService } from "../api/audit-log.service";
+import type { AuditLogStreamEvent } from "../api/audit-log.service";
 
 export const auditLogKeys = {
   all: ["audit-logs"] as const,
@@ -19,7 +20,9 @@ export function useAuditLogs(limit = 40, enabled = true) {
   });
 }
 
-export function useAuditLogStream(onAuditLog?: () => void) {
+export function useAuditLogStream(
+  onAuditLog?: (event: AuditLogStreamEvent) => void,
+) {
   const queryClient = useQueryClient();
   const callbackRef = useRef(onAuditLog);
   const [connected, setConnected] = useState(false);
@@ -31,9 +34,9 @@ export function useAuditLogStream(onAuditLog?: () => void) {
   useEffect(
     () =>
       auditLogService.subscribe(
-        () => {
+        (event) => {
           void queryClient.invalidateQueries({ queryKey: auditLogKeys.all });
-          callbackRef.current?.();
+          callbackRef.current?.(event);
         },
         setConnected,
       ),

@@ -5,7 +5,16 @@ export type OrderStatus =
   | "shipping"
   | "completed"
   | "cancelled"
-  | "rejected";
+  | "rejected"
+  | "return_requested"
+  | "returned"
+  | "return_rejected";
+
+export interface OrderReturnEvidence {
+  url: string;
+  publicId: string;
+  resourceType: "image" | "video";
+}
 
 export interface OrderItem {
   id: string;
@@ -32,6 +41,17 @@ export interface OrderSummary {
   note: string | null;
   rejectionReason: string | null;
   rejectedAt: string | null;
+  confirmedAt: string | null;
+  cancellationReason: string | null;
+  cancelledAt: string | null;
+  cancelledBy: string | null;
+  returnReason: string | null;
+  returnEvidence: OrderReturnEvidence[];
+  returnRequestedAt: string | null;
+  returnReviewReason: string | null;
+  returnReviewedAt: string | null;
+  returnReviewedBy: string | null;
+  stockRestoredAt: string | null;
   createdAt: string;
   updatedAt: string;
   customerName?: string | null;

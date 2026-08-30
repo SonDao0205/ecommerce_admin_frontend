@@ -29,6 +29,10 @@ export class OrderService extends BaseApiService {
   reject(id: string, reason: string): Promise<Order> {
     return this.patch<Order>(`${id}/reject`, { reason });
   }
+
+  reviewReturn(id: string, approved: boolean, reason: string): Promise<Order> {
+    return this.patch<Order>(`${id}/return-review`, { approved, reason });
+  }
 }
 
 export const orderService = new OrderService();

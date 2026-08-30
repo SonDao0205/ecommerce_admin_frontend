@@ -43,3 +43,15 @@ export function useRejectOrder() {
     },
   });
 }
+
+export function useReviewOrderReturn() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, approved, reason }: { id: string; approved: boolean; reason: string }) =>
+      orderService.reviewReturn(id, approved, reason),
+    onSuccess: (order) => {
+      queryClient.setQueryData(orderKeys.detail(order.id), order);
+      return queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+    },
+  });
+}

@@ -20,10 +20,13 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { authService } from "@/src/features/auth";
 import { AuditLogBell } from "@/src/features/audit-logs";
+import { useState } from "react";
+import { ConfirmDialog } from "@/src/components/common/confirm-dialog";
 
 export function AdminHeader() {
   const router = useRouter();
   const pathname = usePathname();
+  const [logoutOpen, setLogoutOpen] = useState(false);
   const title = pathname.startsWith("/admin/categories")
     ? "Quản lý danh mục"
     : pathname.startsWith("/admin/products")
@@ -36,10 +39,11 @@ export function AdminHeader() {
 
   function handleLogout() {
     authService.logout();
+    setLogoutOpen(false);
     router.replace("/login");
   }
 
-  return (
+  return <>
     <header className="sticky top-0 z-30 flex h-[72px] items-center justify-between border-b bg-white px-4 sm:px-7">
       <div className="flex items-center gap-3">
         <Sheet>
@@ -83,12 +87,20 @@ export function AdminHeader() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem>Tài khoản</DropdownMenuItem>
-            <DropdownMenuItem onClick={handleLogout}>
+            <DropdownMenuItem onClick={() => setLogoutOpen(true)}>
               Đăng xuất
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
     </header>
-  );
+    <ConfirmDialog
+      open={logoutOpen}
+      onOpenChange={setLogoutOpen}
+      title="Xác nhận đăng xuất"
+      description="Bạn có chắc muốn đăng xuất khỏi trang quản trị?"
+      confirmLabel="Đăng xuất"
+      onConfirm={handleLogout}
+    />
+  </>;
 }

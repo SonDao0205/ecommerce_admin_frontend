@@ -2,6 +2,12 @@ import { apiBaseUrl, BaseApiService, httpClient } from "@/src/core/api";
 import { tokenStorage } from "@/src/core/auth/token-storage";
 import type { AuditLog } from "../types/audit-log";
 
+export interface AuditLogStreamEvent {
+  id?: string;
+  action?: "INSERT" | "UPDATE" | "DELETE";
+  entityName?: string;
+}
+
 export class AuditLogService extends BaseApiService {
   constructor() {
     super(httpClient, "/audit-logs");
@@ -15,7 +21,7 @@ export class AuditLogService extends BaseApiService {
   }
 
   subscribe(
-    onAuditLog: () => void,
+    onAuditLog: (event: AuditLogStreamEvent) => void,
     onConnectionChange?: (connected: boolean) => void,
   ): () => void {
     const controller = new AbortController();
@@ -43,12 +49,22 @@ export class AuditLogService extends BaseApiService {
           const messages = buffer.split("\n\n");
           buffer = messages.pop() ?? "";
           for (const message of messages) {
-            const event = message
-              .split("\n")
+            const lines = message.split("\n");
+            const event = lines
               .find((line) => line.startsWith("event:"))
               ?.slice(6)
               .trim();
-            if (event === "audit-log") onAuditLog();
+            if (event !== "audit-log") continue;
+            const rawData = lines
+              .filter((line) => line.startsWith("data:"))
+              .map((line) => line.slice(5).trimStart())
+              .join("\n");
+            try {
+              const payload = JSON.parse(rawData) as AuditLogStreamEvent;
+              onAuditLog(payload);
+            } catch {
+              onAuditLog({});
+            }
           }
         }
       } catch (error) {
