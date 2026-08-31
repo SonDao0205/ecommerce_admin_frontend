@@ -10,6 +10,7 @@ import {
   ShoppingCart,
   Tags,
   TicketPercent,
+  Star,
   LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -44,6 +45,7 @@ const sections: SidebarSection[] = [
       { label: "Đơn hàng", icon: ShoppingCart, href: "/admin/orders" },
       { label: "Tồn kho", icon: Warehouse, href: "/admin/inventory" },
       { label: "Voucher", icon: TicketPercent, href: "/admin/vouchers" },
+      { label: "Đánh giá", icon: Star, href: "/admin/reviews" },
     ],
   },
   {
