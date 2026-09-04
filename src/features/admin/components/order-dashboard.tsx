@@ -225,13 +225,14 @@ export function OrderDashboard() {
             <TableBody>
               {ordersQuery.isPending && Array.from({ length: 6 }).map((_, index) => <TableRow key={index}>{Array.from({ length: 7 }).map((__, cell) => <TableCell key={cell}><Skeleton className="h-5 w-full" /></TableCell>)}</TableRow>)}
               {!ordersQuery.isPending && pageOrders.map((order) => {
-                const target = nextStatus[order.status];
+                const paymentReady = order.payment?.provider !== "sepay" || order.payment.status === "success";
+                const target = paymentReady ? nextStatus[order.status] : undefined;
                 return <TableRow key={order.id}>
                   <TableCell className="font-semibold">{order.orderCode}</TableCell>
                   <TableCell><p className="font-medium">{order.customerName ?? order.recipientName}</p><p className="text-xs text-muted-foreground">{order.customerEmail ?? order.customerPhone ?? order.recipientPhone}</p></TableCell>
                   <TableCell>{order.itemCount} sản phẩm</TableCell>
                   <TableCell className="font-semibold text-[#ff5a1f]">{money(order.totalAmount)}</TableCell>
-                  <TableCell><OrderStatusBadge status={order.status} /></TableCell>
+                  <TableCell><div className="space-y-1"><OrderStatusBadge status={order.status} />{order.payment && <PaymentStatusBadge payment={order.payment} />}</div></TableCell>
                   <TableCell className="text-xs text-muted-foreground">{dateTime(order.createdAt)}</TableCell>
                   <TableCell><div className="flex justify-end gap-1">
                     <Button size="icon-sm" variant="ghost" title="Xem chi tiết" onClick={() => setDetailId(order.id)}><Eye /></Button>
@@ -272,11 +273,33 @@ function OrderStatusBadge({ status }: { status: OrderStatus }) {
   return <Badge variant="outline" className={config.className}>{config.label}</Badge>;
 }
 
+function PaymentStatusBadge({ payment }: { payment: NonNullable<Order["payment"]> }) {
+  const labels = {
+    pending: "Chờ thanh toán",
+    success: "Đã thanh toán",
+    failed: "Thanh toán lỗi",
+    cancelled: "Đã hủy thanh toán",
+    expired: "Thanh toán hết hạn",
+    review_required: "Cần đối soát",
+    refunded: "Đã hoàn tiền",
+  } as const;
+  const colors = payment.status === "success"
+    ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+    : payment.status === "review_required"
+      ? "border-orange-200 bg-orange-50 text-orange-700"
+      : "border-zinc-200 bg-zinc-50 text-zinc-600";
+  const label = payment.provider === "cod" && payment.status === "pending"
+    ? "Thanh toán khi nhận hàng"
+    : labels[payment.status];
+  return <Badge variant="outline" className={colors}>{label}</Badge>;
+}
+
 function OrderDetailModal({ order, loading, open, onOpenChange }: { order?: Order; loading: boolean; open: boolean; onOpenChange: (open: boolean) => void }) {
   return <FormModal open={open} onOpenChange={onOpenChange} title={order ? `Đơn hàng ${order.orderCode}` : "Chi tiết đơn hàng"} description="Thông tin khách hàng, giao nhận và sản phẩm trong đơn." className="sm:max-w-[760px]">
     {loading || !order ? <div className="space-y-3">{Array.from({ length: 5 }).map((_, index) => <Skeleton key={index} className="h-12 w-full" />)}</div> : <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-muted/40 p-4"><div><p className="text-xs text-muted-foreground">Trạng thái</p><div className="mt-1"><OrderStatusBadge status={order.status} /></div></div><div className="text-right"><p className="text-xs text-muted-foreground">Tổng thanh toán</p><strong className="text-xl text-[#ff5a1f]">{money(order.totalAmount)}</strong></div></div>
       <div className="grid gap-3 text-sm sm:grid-cols-2"><Info label="Khách hàng" value={order.customerName ?? order.recipientName} /><Info label="Liên hệ tài khoản" value={order.customerEmail ?? order.customerPhone ?? "—"} /><Info label="Người nhận" value={`${order.recipientName} · ${order.recipientPhone}`} /><Info label="Ngày đặt" value={dateTime(order.createdAt)} /><div className="sm:col-span-2"><Info label="Địa chỉ giao hàng" value={order.shippingAddress} /></div>{order.note && <div className="sm:col-span-2"><Info label="Ghi chú" value={order.note} /></div>}{order.rejectionReason && <div className="sm:col-span-2 rounded-lg border border-red-200 bg-red-50 p-3 text-red-700"><strong>Lý do từ chối:</strong> {order.rejectionReason}</div>}</div>
+      {order.payment && <div className="rounded-xl border p-4"><div className="flex items-center justify-between gap-3"><div><p className="text-xs text-muted-foreground">Thanh toán</p><p className="mt-1 font-semibold">{order.payment.provider === "sepay" ? "SePay" : "Thanh toán khi nhận hàng"}</p></div><PaymentStatusBadge payment={order.payment} /></div><div className="mt-3 grid gap-3 text-sm sm:grid-cols-2"><Info label="Mã hóa đơn" value={order.payment.invoiceNumber} /><Info label="Số tiền" value={money(order.payment.amount)} />{order.payment.transactionId && <Info label="Mã giao dịch" value={order.payment.transactionId} />}{order.payment.paidAt && <Info label="Thanh toán lúc" value={dateTime(order.payment.paidAt)} />}</div></div>}
       {order.cancellationReason && <div className="rounded-lg border bg-zinc-50 p-3 text-sm"><strong>Lý do khách hủy:</strong> {order.cancellationReason}</div>}
       {order.returnReason && <div className="rounded-lg border border-orange-200 bg-orange-50 p-3 text-sm text-orange-900"><strong>Lý do yêu cầu hoàn trả:</strong> {order.returnReason}</div>}
       {order.returnEvidence.length > 0 && <ReturnEvidenceGallery evidence={order.returnEvidence} />}

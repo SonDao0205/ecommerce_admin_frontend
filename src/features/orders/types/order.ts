@@ -10,6 +10,36 @@ export type OrderStatus =
   | "returned"
   | "return_rejected";
 
+export type PaymentStatus =
+  | "pending"
+  | "success"
+  | "failed"
+  | "cancelled"
+  | "expired"
+  | "review_required"
+  | "refunded";
+
+export interface Payment {
+  id: string;
+  orderId: string;
+  amount: number;
+  status: PaymentStatus;
+  provider: "cod" | "sepay" | "mock" | "stripe" | "vnpay";
+  method: "cod" | "sepay_bank_transfer" | "sepay_card" | "sepay_napas";
+  invoiceNumber: string;
+  providerOrderId: string | null;
+  transactionId: string | null;
+  currency: string;
+  attemptNumber: number;
+  expiresAt: string | null;
+  paidAt: string | null;
+  failedAt: string | null;
+  cancelledAt: string | null;
+  lastVerifiedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface OrderReturnEvidence {
   url: string;
   publicId: string;
@@ -58,6 +88,7 @@ export interface OrderSummary {
   customerEmail?: string | null;
   customerPhone?: string | null;
   itemCount: number;
+  payment: Payment | null;
 }
 
 export interface Order extends Omit<OrderSummary, "itemCount"> {
